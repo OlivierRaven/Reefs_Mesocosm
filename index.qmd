@@ -83,9 +83,9 @@ relevel_reef4 <- function(df) df %>% mutate(reef_type = factor(as.character(reef
 # Length-Weight of koura
 ```{r}
 #| label: Length-Weight of koura
-#| fig-width: 6
-#| fig-height: 7
-#| dpi: 120
+#| fig-width: 9
+#| fig-height: 5
+#| dpi: 300
 #| fig-cap: "."
 
 summarise_size_weight <- function(df) {
@@ -106,6 +106,43 @@ summarise_size_weight(df_single_raw)
 summarise_size_weight(df_group_raw)
 summarise_size_weight(df_stonewood_raw)
 summarise_size_weight(df_brick_raw)
+
+
+
+df_size_weight_all <- dplyr::bind_rows(
+  df_single_raw %>%
+    dplyr::transmute(experiment = "Single",
+      size_mm1   = as.numeric(size_mm1),
+      weight_g1  = as.numeric(weight_g1),
+      sex= as.factor(sex)), df_group_raw %>%
+    dplyr::transmute(
+      experiment = "Group",
+      size_mm1   = as.numeric(size_mm1),
+      weight_g1  = as.numeric(weight_g1),
+      sex= as.factor(sex)),df_stonewood_raw %>%
+    dplyr::transmute(
+      experiment = "StoneWood",
+      size_mm1   = as.numeric(size_mm1),
+      weight_g1  = as.numeric(weight_g1),
+      sex= as.factor(sex)),df_brick_raw %>%
+    dplyr::transmute(
+      experiment = "Brick",
+      size_mm1   = as.numeric(size_mm1),
+      weight_g1  = as.numeric(weight_g1),
+      sex= as.factor(sex))) %>%
+  dplyr::filter(!is.na(size_mm1), !is.na(weight_g1)) %>%
+  dplyr::mutate(experiment = factor(experiment))
+
+p_size_weight <- ggplot2::ggplot(
+  df_size_weight_all,
+  ggplot2::aes(x = size_mm1, y = weight_g1, colour = sex)) +
+  ggplot2::geom_vline(xintercept = 22, linetype = "dotted") +
+  ggplot2::geom_vline(xintercept = 30, linetype = "dotted") +
+  ggplot2::geom_point()+
+  ggplot2::facet_grid(~ experiment)+
+  labs(x = "OCL Length mm", y = "Weight g")
+
+p_size_weight
 
 ```
 
